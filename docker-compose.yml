@@ -2,8 +2,6 @@ version: '2'
 services:
   web:
     build: .
-    command: node /code/hello-world.js
+    command: "node /code/server.js"
     ports:
-     - "5000:5000"
-    volumes:
-     - .:/code
+     - "4444:8080"
