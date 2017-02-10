@@ -3,5 +3,14 @@ services:
   web:
     build: .
     command: "node /code/server.js"
+    links:
+     - db
     ports:
      - "4444:8080"
+
+  db:
+    image: mongo
+    environment:
+     - MONGODB_DBNAME= mydb
+    volumes: 
+     - './data:/data/db'
