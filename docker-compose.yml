@@ -2,12 +2,14 @@ version: '2'
 services:
   web:
     build: .
-    command: "node /code/hello-world.js"
-     depends_on: 
+    command: "node /test/hello-world.js"
+    depends_on: 
      - message_broker
      - db
     ports:
      - "4444:8080"
+    volumes:
+      - .:/test
 
   db:
     image: mongo
