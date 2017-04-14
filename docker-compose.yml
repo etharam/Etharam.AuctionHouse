@@ -4,7 +4,6 @@ services:
     build: .
     command: ""
     depends_on: 
-     - message_broker
      - db
     ports:
      - "4444:8080"
@@ -15,6 +14,3 @@ services:
      - MONGODB_DBNAME= mydb
     volumes: 
      - './data:/data/db'
-
-  message_broker:
-    image: rabbitmq
