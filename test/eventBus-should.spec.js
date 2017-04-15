@@ -18,46 +18,41 @@ function eventBus() {
 }
 
 describe('Event Bus', () => {
+    const eventType = 'A BUS CONCRETE MESSAGE';
+    let bus;
+
+    beforeEach(() => {
+        bus = eventBus();
+    });
+
     it('should notify subscribers when a certain message is published', (done) => {
-        const bus = eventBus();
-        const eventType = 'A BUS CONCRETE MESSAGE';
         const expectedText = "text message";
-        let receivedText = '';
-        const subscriber = (data) => {
-            receivedText = data.text;
-        };
         const aShouldNonCalledSubscriber = sinon.spy();
+        const subscriber = sinon.spy();
         bus.subscribe({type: 'Another Type', subscriber: aShouldNonCalledSubscriber});
         bus.subscribe({type: eventType, subscriber});
 
+        const expectedData = { text: expectedText };
         bus.publish({
             type: eventType,
-            data: { 
-                text: expectedText
-            }
+            data: expectedData
         });
 
         assertAsync(() => {
             aShouldNonCalledSubscriber.notCalled.should.be.true;
-            receivedText.should.equal(expectedText);
+            subscriber.withArgs(expectedData).calledOnce.should.be.true;
             done();
         });
     });
 
     it('should notify all subscribers for the same message', (done) => {
-        const bus = eventBus();
-        const MESSAGE = 'A BUS CONCRETE MESSAGE';
-        const expectedText = "text message";
         const firstSubscriber = sinon.spy();
         const secondSubscriber = sinon.spy();
-        bus.subscribe({type: MESSAGE, subscriber: firstSubscriber});
-        bus.subscribe({type: MESSAGE, subscriber: secondSubscriber});
+        bus.subscribe({type: eventType, subscriber: firstSubscriber});
+        bus.subscribe({type: eventType, subscriber: secondSubscriber});
         
         bus.publish({
-            type: MESSAGE,
-            data: { 
-                text: expectedText
-            }
+            type: eventType
         });
 
         assertAsync(() => {
