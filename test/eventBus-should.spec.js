@@ -1,21 +1,7 @@
 require('chai').should();
 const sinon = require('sinon');
 
-const amqp = require('amqplib/callback_api');
-
-function eventBus() {
-    const subscriptions = [];
-    return {
-        subscribe({type, subscriber} = {}) {
-            subscriptions.push({type, subscriber});
-        },
-        publish(event) {
-            subscriptions
-                .filter(subscription => subscription.type == event.type)
-                .forEach(subscription => setTimeout(() => subscription.subscriber(event.data)));
-        }
-    }
-}
+const eventBus = require('../infrastructure/eventBus');
 
 describe('Event Bus', () => {
     const eventType = 'A BUS CONCRETE MESSAGE';
