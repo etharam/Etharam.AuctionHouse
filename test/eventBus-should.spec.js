@@ -1,16 +1,17 @@
 require('chai').should();
+const sinon = require('sinon');
 
 const amqp = require('amqplib/callback_api');
 
 function eventBus() {
     const subscriptions = [];
     return {
-        subscribe({message, subscriber} = {}) {
-            subscriptions.push({message, subscriber});
+        subscribe({type, subscriber} = {}) {
+            subscriptions.push({type, subscriber});
         },
         publish(event) {
             subscriptions
-                .filter((subscription => subscription.message == event.message))
+                .filter(subscription => subscription.type == event.type)
                 .forEach(subscription => setTimeout(() => subscription.subscriber(event.data)));
         }
     }
@@ -22,26 +23,22 @@ describe('Event Bus', () => {
         const MESSAGE = 'A BUS CONCRETE MESSAGE';
         const expectedText = "text message";
         let receivedText = '';
-        let nonCalledSubscriberStatus = false;
         const subscriber = (data) => {
             receivedText = data.text;
         };
-        const aShouldNonCalledSubscriber = () => {
-            nonCalledSubscriberStatus = true;
-        }
-        bus.subscribe({message: 'Another Message', subscriber: aShouldNonCalledSubscriber});
-
-        bus.subscribe({message: MESSAGE, subscriber});
+        const aShouldNonCalledSubscriber = sinon.spy();
+        bus.subscribe({type: 'Another Message', subscriber: aShouldNonCalledSubscriber});
+        bus.subscribe({type: MESSAGE, subscriber});
 
         bus.publish({
-            message: MESSAGE,
+            type: MESSAGE,
             data: { 
                 text: expectedText
             }
         });
 
         setTimeout(() => {
-            nonCalledSubscriberStatus.should.be.false;
+            aShouldNonCalledSubscriber.notCalled.should.be.true;
             receivedText.should.equal(expectedText);
             done();
         });
@@ -51,28 +48,21 @@ describe('Event Bus', () => {
         const bus = eventBus();
         const MESSAGE = 'A BUS CONCRETE MESSAGE';
         const expectedText = "text message";
-        let firstSubscriberCalled = false;
-        let secondSubscriberCalled = false;
-        const firstSubscriber = (data) => {
-            firstSubscriberCalled = true;
-        };
-        const secondSubscriber = (data) => {
-            secondSubscriberCalled = true;
-        };
-        bus.subscribe({message: MESSAGE, subscriber: firstSubscriber});
-
-        bus.subscribe({message: MESSAGE, subscriber: secondSubscriber});
-
+        const firstSubscriber = sinon.spy();
+        const secondSubscriber = sinon.spy();
+        bus.subscribe({type: MESSAGE, subscriber: firstSubscriber});
+        bus.subscribe({type: MESSAGE, subscriber: secondSubscriber});
         
         bus.publish({
-            message: MESSAGE,
+            type: MESSAGE,
             data: { 
                 text: expectedText
             }
         });
+
         setTimeout(() => {
-            firstSubscriberCalled.should.be.true;
-            secondSubscriberCalled.should.be.true;
+            firstSubscriber.calledOnce.should.be.true;
+            secondSubscriber.calledOnce.should.be.true;
             done();
         });
     });
