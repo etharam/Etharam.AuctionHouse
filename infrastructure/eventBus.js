@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 module.exports = function eventBus() {
     const subscriptions = [];
     return {
@@ -5,9 +7,9 @@ module.exports = function eventBus() {
             subscriptions.push({type, subscriber});
         },
         publish(event) {
-            subscriptions
-                .filter(subscription => subscription.type == event.type)
-                .forEach(subscription => setTimeout(() => subscription.subscriber(event.data)));
+            _(subscriptions)
+                .filter({type: event.type})
+                .each(subscription => setTimeout(() => subscription.subscriber(event.data)));
         }
     }
 }
