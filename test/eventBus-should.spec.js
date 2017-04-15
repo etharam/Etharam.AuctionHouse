@@ -21,11 +21,10 @@ describe('Event Bus', () => {
         const bus = eventBus();
         const MESSAGE = 'A BUS CONCRETE MESSAGE';
         const expectedText = "text message";
+        let receivedText = '';
         let nonCalledSubscriberStatus = false;
         const subscriber = (data) => {
-            data.text.should.equal(expectedText);
-            nonCalledSubscriberStatus.should.be.false;
-            done();
+            receivedText = data.text;
         };
         const aShouldNonCalledSubscriber = () => {
             nonCalledSubscriberStatus = true;
@@ -39,6 +38,12 @@ describe('Event Bus', () => {
             data: { 
                 text: expectedText
             }
+        });
+
+        setTimeout(() => {
+            nonCalledSubscriberStatus.should.be.false;
+            receivedText.should.equal(expectedText);
+            done();
         });
     });
 
