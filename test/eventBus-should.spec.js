@@ -20,24 +20,24 @@ function eventBus() {
 describe('Event Bus', () => {
     it('should notify subscribers when a certain message is published', (done) => {
         const bus = eventBus();
-        const MESSAGE = 'A BUS CONCRETE MESSAGE';
+        const eventType = 'A BUS CONCRETE MESSAGE';
         const expectedText = "text message";
         let receivedText = '';
         const subscriber = (data) => {
             receivedText = data.text;
         };
         const aShouldNonCalledSubscriber = sinon.spy();
-        bus.subscribe({type: 'Another Message', subscriber: aShouldNonCalledSubscriber});
-        bus.subscribe({type: MESSAGE, subscriber});
+        bus.subscribe({type: 'Another Type', subscriber: aShouldNonCalledSubscriber});
+        bus.subscribe({type: eventType, subscriber});
 
         bus.publish({
-            type: MESSAGE,
+            type: eventType,
             data: { 
                 text: expectedText
             }
         });
 
-        setTimeout(() => {
+        assertAsync(() => {
             aShouldNonCalledSubscriber.notCalled.should.be.true;
             receivedText.should.equal(expectedText);
             done();
@@ -60,10 +60,14 @@ describe('Event Bus', () => {
             }
         });
 
-        setTimeout(() => {
+        assertAsync(() => {
             firstSubscriber.calledOnce.should.be.true;
             secondSubscriber.calledOnce.should.be.true;
             done();
         });
     });
+
+    function assertAsync(assertion) {
+        setTimeout(assertion);
+    }
 });
