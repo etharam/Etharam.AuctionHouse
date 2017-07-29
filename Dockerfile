@@ -1,3 +1,5 @@
+FROM python:3.6.2-jessie
+
 WORKDIR /usr/src/app
 RUN mkdir example
 WORKDIR ./example
