@@ -4,4 +4,4 @@ from expects import *
 
 with description('mamba'):
     with it('true is true'):
-        expect(True).to(be_true)
+        expect(True).to(be_false)
