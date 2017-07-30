@@ -3,5 +3,5 @@ test:
 	docker run -it au/tests:1.0 mamba --format documentation .;
 
 start:
-	@docker build -t au/tests:1.0 .; \
-	docker run -p 5000:5000 au/tests:1.0 python src/hello.py; 
+	@docker build -t auctionhouse:1.0 .; \
+	docker run -p 5000:5000 auctionhouse:1.0; 
