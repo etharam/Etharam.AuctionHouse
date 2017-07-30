@@ -7,6 +7,3 @@ RUN mkdir /code
 COPY . /code
 
 WORKDIR /code
-
-ENTRYPOINT ["python"]
-CMD ["src/hello.py"]

@@ -4,4 +4,4 @@ test:
 
 start:
 	@docker build -t au/tests:1.0 .; \
-	docker run -p 5000:5000 au/tests:1.0; 
+	docker run -p 5000:5000 au/tests:1.0 python src/hello.py; 
