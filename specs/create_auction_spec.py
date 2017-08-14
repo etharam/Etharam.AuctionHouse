@@ -1,18 +1,10 @@
 from expects import expect, equal, have_len
 from doublex import Stub
 
+from specs.helpers.test_message_queue import TestMessageQueue
+
 from src.actions.create_auction import CreateAuction
 
-class TestMessageQueue:
-    def __init__(self):
-        self._events = []
-
-    def publish(self, event):
-        self._events.append(event)
-
-    @property
-    def events(self):
-        return self._events
 
 with description('Create Auction'):
     with it('raises an auction created event'):
