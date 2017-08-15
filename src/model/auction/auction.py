@@ -6,35 +6,36 @@ from src.model.auction.auction_error import AuctionError
 class Auction:
     AUCTION_CREATED_TYPE = 'AUCTION_CREATED'
 
-    def __init__(self, auction_id, auctioneer, item, expiration_date, selling_price):
-        self._auction_id = auction_id
-        self._auctioneer = auctioneer
-        self._item = item
-        self._expiration_date = expiration_date
-        self._selling_price = selling_price
+    def __init__(self):
         self._events = []
-        self._create_auction_event()
 
     @property
     def events(self):
         return self._events
 
-    def _create_auction_event(self):
+    @classmethod
+    def _create_auction_event(cls, auction_id, auctioneer, item, expiration_date, selling_price):
         return {
-            'type': self.AUCTION_CREATED_TYPE,
-            'auction_id': self._auction_id,
-            'auctioneer': self._auctioneer,
-            'item': self._item,
-            'expiration_date': self._expiration_date.isoformat(),
-            'selling_price': self._selling_price
+            'type': cls.AUCTION_CREATED_TYPE,
+            'auction_id': auction_id,
+            'auctioneer': auctioneer,
+            'item': item,
+            'expiration_date': expiration_date.isoformat(),
+            'selling_price': selling_price
         }
 
     @classmethod
     def create(cls, auction_id, auctioneer, item, expiration_date, selling_price):
         cls.verify_invariants(selling_price=selling_price, expiration_date=expiration_date)
-        auction = Auction(auction_id, auctioneer, item, expiration_date, selling_price)
-        auction.events.append(auction._create_auction_event())
+        auction = Auction()
+        auction_created = cls._create_auction_event(auction_id, auctioneer, item, expiration_date, selling_price)
+        auction._process(auction_created)
+        auction.events.append(auction_created)
         return auction
+
+    def _process(self, event):
+        self._auction_id = event['auction_id']
+
 
     @classmethod
     def verify_invariants(cls, selling_price, expiration_date):
