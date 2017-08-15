@@ -2,6 +2,7 @@ from expects import expect, equal, have_len
 from doublex import Stub
 
 from specs.helpers.test_message_queue import TestMessageQueue
+from specs.helpers.mamba_keywords import description, it
 
 from src.actions.create_auction import CreateAuction
 
