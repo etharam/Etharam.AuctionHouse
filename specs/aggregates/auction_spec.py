@@ -1,6 +1,6 @@
 from expects import expect, equal, have_len, raise_error
 
-from specs.helpers.mamba_keywords import description, it
+from specs.helpers.mamba_keywords import description, context, it
 
 
 class Auction:
@@ -50,21 +50,23 @@ def auction_with(price):
 
 
 with description('Auction'):
-    with it('produces an event of auction created'):
-        price = 600
-        auction = auction_with(price=price)
+    with context('on creation success'):
+        with it('produces an event of auction created'):
+            price = 600
+            auction = auction_with(price=price)
 
-        expect(auction.events).to(have_len(1))
-        expect(auction.events[0]).to(equal({
-            'type': 'AUCTION_CREATED',
-            'auction_id': 'an_auction_id',
-            'auctioneer': 'an_auctioneer_id',
-            'item': 'an_item_id',
-            'period': 'anything',
-            'selling_price': price
-        }))
+            expect(auction.events).to(have_len(1))
+            expect(auction.events[0]).to(equal({
+                'type': 'AUCTION_CREATED',
+                'auction_id': 'an_auction_id',
+                'auctioneer': 'an_auctioneer_id',
+                'item': 'an_item_id',
+                'period': 'anything',
+                'selling_price': price
+            }))
 
-    with it('does not allow the creation when selling price is less than 1'):
-        auction = lambda: auction_with(price=0)
+    with context('on invariants failed'):
+        with it('does not allow the creation when selling price is less than 1'):
+            auction = lambda: auction_with(price=0)
 
-        expect(auction).to(raise_error(AuctionException))
+            expect(auction).to(raise_error(AuctionException))
