@@ -44,9 +44,15 @@ class AuctionException(Exception):
     pass
 
 
+def auction_with(price):
+    return Auction.create(auction_id='an_auction_id', auctioneer='an_auctioneer_id', item='an_item_id',
+                          period='anything', selling_price=price)
+
+
 with description('Auction'):
     with it('produces an event of auction created'):
-        auction = Auction.create(auction_id='an_auction_id', auctioneer='an_auctioneer_id', item='an_item_id', period='anything', selling_price=600)
+        price = 600
+        auction = auction_with(price=price)
 
         expect(auction.events).to(have_len(1))
         expect(auction.events[0]).to(equal({
@@ -55,10 +61,10 @@ with description('Auction'):
             'auctioneer': 'an_auctioneer_id',
             'item': 'an_item_id',
             'period': 'anything',
-            'selling_price': 600
+            'selling_price': price
         }))
 
     with it('does not allow the creation when selling price is less than 1'):
-        auction = lambda: Auction.create(auction_id='an_auction_id', auctioneer='an_auctioneer_id', item='an_item_id', period='anything', selling_price=0)
+        auction = lambda: auction_with(price=0)
 
         expect(auction).to(raise_error(AuctionException))
