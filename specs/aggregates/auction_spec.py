@@ -18,19 +18,25 @@ class Auction:
         return self._events
 
     def _create_auction_event(self):
-        self._events.append({
+        return {
             'type': 'AUCTION_CREATED',
             'auction_id': self._auction_id,
             'auctioneer': self._auctioneer,
             'item': self._item,
             'period': self._period,
             'selling_price': self._selling_price
-        })
+        }
+
+    @classmethod
+    def create(cls, auction_id, auctioneer, item, period, selling_price):
+        auction = Auction(auction_id, auctioneer, item, period, selling_price)
+        auction.events.append(auction._create_auction_event())
+        return auction
 
 
 with description('Auction'):
     with it('should produce an event of auction created'):
-        auction = Auction(auction_id='an_auction_id', auctioneer='an_auctioneer_id', item='an_item_id', period='anything', selling_price=600)
+        auction = Auction.create(auction_id='an_auction_id', auctioneer='an_auctioneer_id', item='an_item_id', period='anything', selling_price=600)
 
         expect(auction.events).to(have_len(1))
         expect(auction.events[0]).to(equal({
