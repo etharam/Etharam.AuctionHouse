@@ -37,9 +37,9 @@ class Auction:
     @classmethod
     def verify_invariants(cls, selling_price, expiration_date):
         if selling_price < 1:
-            raise AuctionError()
+            raise AuctionError('selling price must be greater than 1')
         if expiration_date < date.today():
-            raise AuctionError()
+            raise AuctionError('expiration date cannot be before today')
 
 
 class AuctionError(Exception):
@@ -71,10 +71,10 @@ with description('Auction'):
         with it('does not allow the creation when selling price is less than 1'):
             auction = lambda: auction_with(price=0)
 
-            expect(auction).to(raise_error(AuctionError))
+            expect(auction).to(raise_error(AuctionError, 'selling price must be greater than 1'))
 
         with it('does not allow the creation when expiration date is before today'):
             yesterday = date.today() - timedelta(days=1)
             auction = lambda: auction_with(price=600, expiration_date=yesterday)
 
-            expect(auction).to(raise_error(AuctionError))
+            expect(auction).to(raise_error(AuctionError, 'expiration date cannot be before today'))
