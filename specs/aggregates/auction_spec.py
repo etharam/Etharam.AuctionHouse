@@ -4,6 +4,8 @@ from specs.helpers.mamba_keywords import description, context, it
 from datetime import date, timedelta
 
 class Auction:
+    AUCTION_CREATED_TYPE = 'AUCTION_CREATED'
+
     def __init__(self, auction_id, auctioneer, item, expiration_date, selling_price):
         self._auction_id = auction_id
         self._auctioneer = auctioneer
@@ -19,7 +21,7 @@ class Auction:
 
     def _create_auction_event(self):
         return {
-            'type': 'AUCTION_CREATED',
+            'type': self.AUCTION_CREATED_TYPE,
             'auction_id': self._auction_id,
             'auctioneer': self._auctioneer,
             'item': self._item,
@@ -59,7 +61,7 @@ with description('Auction'):
 
             expect(auction.events).to(have_len(1))
             expect(auction.events[0]).to(equal({
-                'type': 'AUCTION_CREATED',
+                'type': Auction.AUCTION_CREATED_TYPE,
                 'auction_id': 'an_auction_id',
                 'auctioneer': 'an_auctioneer_id',
                 'item': 'an_item_id',
