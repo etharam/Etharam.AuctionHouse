@@ -8,6 +8,7 @@ from src.actions.create_auction import CreateAuction
 
 
 with description('Create Auction'):
+    #TODO: use the aggregate in the action
     with it('raises an auction created event'):
         with Stub() as id_generator:
             id_generator.new_id().delegates(['an_auction_id'])

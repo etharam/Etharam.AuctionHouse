@@ -1,0 +1,2 @@
+class AuctionError(Exception):
+    pass
