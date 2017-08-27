@@ -14,8 +14,14 @@ def auction_with(price, expiration_date=date.max):
 
 with description('Auction'):
     with it('is created'):
-        price = 600
-        auction = auction_with(price=price, expiration_date=date.today())
+        expected_price = 600
+
+        auction = Auction.create(
+            auction_id='an_auction_id',
+            auctioneer='an_auctioneer_id',
+            item='an_item_id',
+            expiration_date=date.today(),
+            selling_price=expected_price)
 
         expect(auction.events).to(have_len(1))
         expect(auction.events[0]).to(equal({
@@ -24,9 +30,8 @@ with description('Auction'):
             'auctioneer': 'an_auctioneer_id',
             'item': 'an_item_id',
             'expiration_date': date.today().isoformat(),
-            'selling_price': price
+            'selling_price': expected_price
         }))
-
 
     with it('is not created when selling price is less than 1'):
         auction = lambda: auction_with(price=0)
