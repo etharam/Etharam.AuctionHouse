@@ -29,7 +29,6 @@ class Auction:
         cls.verify_invariants(selling_price=selling_price, expiration_date=expiration_date)
         auction = Auction()
         auction_created = cls._create_auction_event(auction_id, auctioneer, item, expiration_date, selling_price)
-        auction._process(auction_created)
         auction.events.append(auction_created)
         return auction
 
