@@ -48,3 +48,24 @@ with description('Auction'):
         auction = lambda: auction_with(price=600, expiration_date=yesterday)
 
         expect(auction).to(raise_error(AuctionError, 'expiration date cannot be before today'))
+
+    with it('accepts purchase of the item by its selling_price'):
+        expected_price = 600
+        auction = Auction.rebuild(
+            [{
+                'type': Auction.AUCTION_CREATED_TYPE,
+                'auction_id': AN_AUCTION_ID,
+                'auctioneer': AN_AUCTIONEER_ID,
+                'item': AN_ITEM_ID,
+                'expiration_date': date.today().isoformat(),
+                'selling_price': expected_price
+            }]
+        )
+
+        auction.buy()
+
+        expect(auction.events).to(have_len(1))
+        expect(auction.events[0]).to(equal({
+            'auction_id': AN_AUCTION_ID,
+            'type': Auction.AUCTION_PURCHASED
+        }))

@@ -4,6 +4,7 @@ from src.model.auction.auction_error import AuctionError
 
 
 class Auction:
+    AUCTION_PURCHASED = 'AUCTION_PURCHASED'
     AUCTION_CREATED_TYPE = 'AUCTION_CREATED'
 
     def __init__(self):
@@ -32,9 +33,10 @@ class Auction:
         auction.events.append(auction_created)
         return auction
 
-    def _process(self, event):
-        self._auction_id = event['auction_id']
-
+    def buy(self):
+        auction_purchased = {'auction_id': self.id, 'type': self.AUCTION_PURCHASED}
+        self.events.append(auction_purchased)
+        
 
     @classmethod
     def verify_invariants(cls, selling_price, expiration_date):
@@ -42,3 +44,9 @@ class Auction:
             raise AuctionError('selling price must be greater than 1')
         if expiration_date < date.today():
             raise AuctionError('expiration date cannot be before today')
+
+    @classmethod
+    def rebuild(cls, events):
+        auction = Auction()
+        auction.id = events[0]['auction_id']
+        return auction
