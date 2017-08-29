@@ -48,5 +48,16 @@ class Auction:
     @classmethod
     def rebuild(cls, events):
         auction = Auction()
-        auction.id = events[0]['auction_id']
+        for event in events:
+            auction.process(event)
         return auction
+
+    def process(self, event):
+        processors = {
+            self.AUCTION_CREATED_TYPE: self._process_created_event
+        }
+        processors[event['type']](event)
+
+    def _process_created_event(self, event):
+        self.id = event['auction_id']
+
