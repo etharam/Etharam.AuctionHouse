@@ -36,7 +36,6 @@ class Auction:
     def buy(self):
         auction_purchased = {'auction_id': self.id, 'type': self.AUCTION_PURCHASED}
         self.events.append(auction_purchased)
-        
 
     @classmethod
     def verify_invariants(cls, selling_price, expiration_date):
