@@ -6,29 +6,34 @@ from specs.helpers.mamba_keywords import description, context, it
 from src.model.auction.auction import Auction
 from src.model.auction.auction_error import AuctionError
 
+AN_ITEM_ID = 'an_item_id'
+
+AN_AUCTIONEER_ID = 'an_auctioneer_id'
+
+AN_AUCTION_ID = 'an_auction_id'
+
 
 def auction_with(price, expiration_date=date.max):
-    return Auction.create(auction_id='an_auction_id', auctioneer='an_auctioneer_id', item='an_item_id',
+    return Auction.create(auction_id=AN_AUCTION_ID, auctioneer=AN_AUCTIONEER_ID, item=AN_ITEM_ID,
                           expiration_date=expiration_date, selling_price=price)
-
 
 with description('Auction'):
     with it('is created'):
         expected_price = 600
 
         auction = Auction.create(
-            auction_id='an_auction_id',
-            auctioneer='an_auctioneer_id',
-            item='an_item_id',
+            auction_id=AN_AUCTION_ID,
+            auctioneer=AN_AUCTIONEER_ID,
+            item=AN_ITEM_ID,
             expiration_date=date.today(),
             selling_price=expected_price)
 
         expect(auction.events).to(have_len(1))
         expect(auction.events[0]).to(equal({
             'type': Auction.AUCTION_CREATED_TYPE,
-            'auction_id': 'an_auction_id',
-            'auctioneer': 'an_auctioneer_id',
-            'item': 'an_item_id',
+            'auction_id': AN_AUCTION_ID,
+            'auctioneer': AN_AUCTIONEER_ID,
+            'item': AN_ITEM_ID,
             'expiration_date': date.today().isoformat(),
             'selling_price': expected_price
         }))
