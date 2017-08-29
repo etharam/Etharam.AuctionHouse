@@ -49,10 +49,10 @@ class Auction:
     def rebuild(cls, events):
         auction = Auction()
         for event in events:
-            auction.process(event)
+            auction._process(event)
         return auction
 
-    def process(self, event):
+    def _process(self, event):
         processors = {
             self.AUCTION_CREATED_TYPE: self._process_created_event
         }
