@@ -29,7 +29,7 @@ class Auction:
 
     @classmethod
     def create(cls, auction_id, auctioneer, item, expiration_date, selling_price):
-        cls.verify_invariants(selling_price=selling_price, expiration_date=expiration_date)
+        cls._verify_creation(selling_price=selling_price, expiration_date=expiration_date)
         auction = Auction()
         auction_created = cls._create_auction_event(auction_id, auctioneer, item, expiration_date, selling_price)
         auction.events.append(auction_created)
@@ -40,7 +40,7 @@ class Auction:
         self.events.append(auction_purchased)
 
     @classmethod
-    def verify_invariants(cls, selling_price, expiration_date):
+    def _verify_creation(cls, selling_price, expiration_date):
         if selling_price < 1:
             raise AuctionError('selling price must be greater than 1')
         if expiration_date < date.today():
