@@ -69,3 +69,25 @@ with description('Auction'):
             'auction_id': AN_AUCTION_ID,
             'type': Auction.AUCTION_PURCHASED
         }))
+
+    with it('accepts a bid'):
+        auction = Auction.rebuild(
+            [{
+                'type': Auction.AUCTION_CREATED_TYPE,
+                'auction_id': AN_AUCTION_ID,
+                'auctioneer': AN_AUCTIONEER_ID,
+                'item': AN_ITEM_ID,
+                'expiration_date': date.today().isoformat(),
+                'selling_price': 600
+            }]
+        )
+
+        auction.bid_up({'id': 'any_bidder', 'amount': 100})
+
+        expect(auction.events).to(have_len(1))
+        expect(auction.events[0]).to(equal({
+            'auction_id': AN_AUCTION_ID,
+            'type': Auction.AUCTION_BID_SUBMITTED,
+            'bidder_id': 'any_bidder',
+            'bid_amount': 100
+        }))

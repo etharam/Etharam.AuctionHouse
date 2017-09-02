@@ -4,6 +4,7 @@ from src.model.auction.auction_error import AuctionError
 
 
 class Auction:
+    AUCTION_BID_SUBMITTED = 'AUCTION_BID_SUBMITTED'
     AUCTION_PURCHASED = 'AUCTION_PURCHASED'
     AUCTION_CREATED_TYPE = 'AUCTION_CREATED'
 
@@ -59,4 +60,12 @@ class Auction:
 
     def _process_created_event(self, event):
         self.id = event['auction_id']
+
+    def bid_up(self, bid):
+        self.events.append({
+            'auction_id': self.id,
+            'type': self.AUCTION_BID_SUBMITTED,
+            'bidder_id': bid['id'],
+            'bid_amount': bid['amount']
+        })
 
