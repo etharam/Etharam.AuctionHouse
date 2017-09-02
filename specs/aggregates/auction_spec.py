@@ -92,7 +92,7 @@ with description('Auction'):
             'bid_amount': 100
         }))
 
-    with it('does not accept bids which dont increase the previous one'):
+    with it('does not accept a bid which does not increase the previous one'):
         auction = Auction.rebuild(
             [{
                 'type': Auction.AUCTION_CREATED_TYPE,
