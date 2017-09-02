@@ -39,12 +39,15 @@ class Auction:
         auction_purchased = {'auction_id': self.id, 'type': self.AUCTION_PURCHASED}
         self.events.append(auction_purchased)
 
-    @classmethod
-    def _verify_creation(cls, selling_price, expiration_date):
-        if selling_price < 1:
-            raise AuctionError('selling price must be greater than 1')
-        if expiration_date < date.today():
-            raise AuctionError('expiration date cannot be before today')
+    def bid_up(self, bid):
+        if self._current_bid_amount > bid['amount']:
+            raise AuctionError('new bids must increase the current one')
+        self.events.append({
+            'auction_id': self.id,
+            'type': self.AUCTION_BID_SUBMITTED,
+            'bidder_id': bid['id'],
+            'bid_amount': bid['amount']
+        })
 
     @classmethod
     def rebuild(cls, events):
@@ -52,6 +55,13 @@ class Auction:
         for event in events:
             auction._process(event)
         return auction
+
+    @classmethod
+    def _verify_creation(cls, selling_price, expiration_date):
+        if selling_price < 1:
+            raise AuctionError('selling price must be greater than 1')
+        if expiration_date < date.today():
+            raise AuctionError('expiration date cannot be before today')
 
     def _process(self, event):
         processors = {
@@ -66,14 +76,4 @@ class Auction:
     def _process_created_event(self, event):
         self.id = event['auction_id']
         self._current_bid_amount = 0
-
-    def bid_up(self, bid):
-        if self._current_bid_amount > bid['amount']:
-            raise AuctionError('new bids must increase the current one')
-        self.events.append({
-            'auction_id': self.id,
-            'type': self.AUCTION_BID_SUBMITTED,
-            'bidder_id': bid['id'],
-            'bid_amount': bid['amount']
-        })
 
