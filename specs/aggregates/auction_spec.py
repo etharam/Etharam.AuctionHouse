@@ -91,3 +91,25 @@ with description('Auction'):
             'bidder_id': 'any_bidder',
             'bid_amount': 100
         }))
+
+    with it('does not accept bids which dont increase the previous one'):
+        auction = Auction.rebuild(
+            [{
+                'type': Auction.AUCTION_CREATED_TYPE,
+                'auction_id': AN_AUCTION_ID,
+                'auctioneer': AN_AUCTIONEER_ID,
+                'item': AN_ITEM_ID,
+                'expiration_date': date.today().isoformat(),
+                'selling_price': 600
+            }, {
+                'auction_id': AN_AUCTION_ID,
+                'type': Auction.AUCTION_BID_ACCEPTED,
+                'bidder_id': 'any_bidder',
+                'bid_amount': 200
+            }]
+        )
+
+        def bid_up():
+            auction.bid_up({'id': 'another_bidder', 'amount': 100})
+
+        expect(bid_up).to(raise_error(AuctionError, 'new bids must increase the current one'))

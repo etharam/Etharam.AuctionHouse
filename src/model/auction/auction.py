@@ -4,6 +4,7 @@ from src.model.auction.auction_error import AuctionError
 
 
 class Auction:
+    AUCTION_BID_ACCEPTED = 'AUCTION_BID_ACCEPTED'
     AUCTION_BID_SUBMITTED = 'AUCTION_BID_SUBMITTED'
     AUCTION_PURCHASED = 'AUCTION_PURCHASED'
     AUCTION_CREATED_TYPE = 'AUCTION_CREATED'
@@ -54,14 +55,21 @@ class Auction:
 
     def _process(self, event):
         processors = {
-            self.AUCTION_CREATED_TYPE: self._process_created_event
+            self.AUCTION_CREATED_TYPE: self._process_created_event,
+            self.AUCTION_BID_ACCEPTED: self._process_bid_accepted
         }
         processors[event['type']](event)
 
+    def _process_bid_accepted(self, event):
+        self._current_bid_amount = event['bid_amount']
+
     def _process_created_event(self, event):
         self.id = event['auction_id']
+        self._current_bid_amount = 0
 
     def bid_up(self, bid):
+        if self._current_bid_amount > bid['amount']:
+            raise AuctionError('new bids must increase the current one')
         self.events.append({
             'auction_id': self.id,
             'type': self.AUCTION_BID_SUBMITTED,
