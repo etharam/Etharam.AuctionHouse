@@ -4,6 +4,7 @@ from src.model.auction.auction_error import AuctionError
 
 
 class Auction:
+    AUCTION_BID_ACCEPTED = 'AUCTION_BID_ACCEPTED'
     AUCTION_BID_SUBMITTED = 'AUCTION_BID_SUBMITTED'
     AUCTION_PURCHASED = 'AUCTION_PURCHASED'
     AUCTION_CREATED_TYPE = 'AUCTION_CREATED'
@@ -28,7 +29,7 @@ class Auction:
 
     @classmethod
     def create(cls, auction_id, auctioneer, item, expiration_date, selling_price):
-        cls.verify_invariants(selling_price=selling_price, expiration_date=expiration_date)
+        cls._verify_creation(selling_price=selling_price, expiration_date=expiration_date)
         auction = Auction()
         auction_created = cls._create_auction_event(auction_id, auctioneer, item, expiration_date, selling_price)
         auction.events.append(auction_created)
@@ -38,12 +39,15 @@ class Auction:
         auction_purchased = {'auction_id': self.id, 'type': self.AUCTION_PURCHASED}
         self.events.append(auction_purchased)
 
-    @classmethod
-    def verify_invariants(cls, selling_price, expiration_date):
-        if selling_price < 1:
-            raise AuctionError('selling price must be greater than 1')
-        if expiration_date < date.today():
-            raise AuctionError('expiration date cannot be before today')
+    def bid_up(self, bid):
+        if self._current_bid_amount > bid['amount']:
+            raise AuctionError('new bids must increase the current one')
+        self.events.append({
+            'auction_id': self.id,
+            'type': self.AUCTION_BID_SUBMITTED,
+            'bidder_id': bid['id'],
+            'bid_amount': bid['amount']
+        })
 
     @classmethod
     def rebuild(cls, events):
@@ -52,20 +56,24 @@ class Auction:
             auction._process(event)
         return auction
 
+    @classmethod
+    def _verify_creation(cls, selling_price, expiration_date):
+        if selling_price < 1:
+            raise AuctionError('selling price must be greater than 1')
+        if expiration_date < date.today():
+            raise AuctionError('expiration date cannot be before today')
+
     def _process(self, event):
         processors = {
-            self.AUCTION_CREATED_TYPE: self._process_created_event
+            self.AUCTION_CREATED_TYPE: self._process_created_event,
+            self.AUCTION_BID_ACCEPTED: self._process_bid_accepted
         }
         processors[event['type']](event)
 
+    def _process_bid_accepted(self, event):
+        self._current_bid_amount = event['bid_amount']
+
     def _process_created_event(self, event):
         self.id = event['auction_id']
-
-    def bid_up(self, bid):
-        self.events.append({
-            'auction_id': self.id,
-            'type': self.AUCTION_BID_SUBMITTED,
-            'bidder_id': bid['id'],
-            'bid_amount': bid['amount']
-        })
+        self._current_bid_amount = 0
 
