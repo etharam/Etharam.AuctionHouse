@@ -8,4 +8,4 @@ script:
 - ./travis-build.sh
 before_install:
 - openssl aes-256-cbc -K $encrypted_0afed5a974a1_key -iv $encrypted_0afed5a974a1_iv
-  -in test-pubsub.json.enc -out test-pubsub.json -d
+  -in test-pubsub.json.enc -out credentials/test-pubsub.json -d
