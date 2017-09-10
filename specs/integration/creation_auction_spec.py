@@ -2,7 +2,7 @@ import uuid
 from time import sleep
 
 from arrow import utcnow
-from doublex import Spy, assert_that, called, never
+from doublex import Spy, assert_that, called
 
 from specs.helpers.mamba_keywords import *
 from src.actions.create_auction import CreateAuction
@@ -63,5 +63,5 @@ with description('Create auction'):
 
         EventConsumer(pub_sub_message_bus, fake_event_store).listen()
 
-        sleep(1.5)
+        sleep(3)
         assert_that(fake_event_store.persist,  called())
