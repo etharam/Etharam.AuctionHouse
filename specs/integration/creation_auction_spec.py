@@ -63,13 +63,5 @@ with description('Create auction'):
 
         EventConsumer(pub_sub_message_bus, fake_event_store).listen()
 
-        test_status = {'is_running' : True}
-        def callback(*kwargs):
-            sleep(1)
-            assert_that(fake_event_store.persist,  called())
-            test_status['is_running'] = False
-
-        pub_sub_message_bus.subscribe('watever', callback=callback)
-
-        while test_status['is_running']:
-            pass
+        sleep(1.5)
+        assert_that(fake_event_store.persist,  called())
